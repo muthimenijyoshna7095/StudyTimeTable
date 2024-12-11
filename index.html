@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrolling Text Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url(https://k8school.com/wp-content/uploads/2024/02/The-Ultimate-Guide-to-Creating-a-Time-Table-Schedule-for-Study.jpg) no-repeat center center fixed; 
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.4); 
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            text-shadow: 5px 5px 10px red, 5px 5px 10px black;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 10px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #e7e7e7;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .warning-message {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            background-color: pink;
+        }
+
+        .scrolling-text {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        .scrolling-text span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-text 10s linear infinite;
+        }
+
+        @keyframes scroll-text {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Timetable Schedule</h1>
+        <form id="timetable-form">
+            <label for="startTime">Start Time:</label>
+            <input type="time" id="startTime" required>
+
+            <label for="totalTime">Total Study Time (hours):</label>
+            <input type="number" id="totalTime" required>
+
+            <label for="chapters">Number of Chapters:</label>
+            <input type="number" id="chapters" required>
+
+            <button type="submit">Generate Schedule</button>
+        </form>
+
+        <h2>Schedule</h2>
+        <ul id="schedule-list"></ul>
+
+        <div id="warning-message" class="warning-message"></div>
+    </div>
+
+    <div class="scrolling-text">
+        <span>"Plan Your Time, Achieve Your Goals!"</span>
+    </div>
+
+    <script>
+        document.getElementById('timetable-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const startTime = document.getElementById('startTime').value;
+            const totalTime = parseInt(document.getElementById('totalTime').value) * 60;
+            const numberOfChapters = parseInt(document.getElementById('chapters').value);
+
+            const scheduleList = document.getElementById('schedule-list');
+            const warningMessage = document.getElementById('warning-message');
+            scheduleList.innerHTML = '';
+            warningMessage.textContent = '';
+
+            let studySession = 45;
+            let breakSession = 10;
+            let totalMinutes = 0;
+            let chaptersCovered = 0;
+
+            const requiredTime = numberOfChapters * (studySession + breakSession) - breakSession;
+
+            if (totalTime < requiredTime) {
+                warningMessage.textContent = 'Warning: Insufficient time to cover all chapters! Spend more time to reach your goals!';
+                return;
+            }
+
+            let [startHours, startMinutes] = startTime.split(':').map(Number);
+            let currentTime = new Date();
+            currentTime.setHours(startHours);
+            currentTime.setMinutes(startMinutes);
+            currentTime.setSeconds(0);
+
+            while (totalMinutes < totalTime && chaptersCovered < numberOfChapters) {
+                let start = formatTime(currentTime);
+                currentTime.setMinutes(currentTime.getMinutes() + studySession);
+                let end = formatTime(currentTime);
+                chaptersCovered++;
+                totalMinutes += studySession;
+
+                const listItem = document.createElement('li');
+                listItem.textContent = `Study Chapter ${chaptersCovered} from ${start} to ${end}.`;
+                scheduleList.appendChild(listItem);
+
+                if (totalMinutes < totalTime && chaptersCovered < numberOfChapters) {
+                    currentTime.setMinutes(currentTime.getMinutes() + breakSession);
+                    totalMinutes += breakSession;
+                }
+            }
+
+            document.getElementById('timetable-form').reset();
+        });
+
+        function formatTime(date) {
+            let hours = date.getHours().toString().padStart(2, '0');
+            let minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+    </script>
+</body>
+</html>
